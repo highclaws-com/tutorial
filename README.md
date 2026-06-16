@@ -1,4 +1,4 @@
-# Tutorial Repository
+# Tutorial
 
 Welcome to the **Tutorial** repository. This repository is designed to host onboarding tutorials and sandbox verification files for both human users and agentic AIs across multiple locales.
 
@@ -25,7 +25,7 @@ Each category folder is prefixed with a three-digit sequence (e.g., `001-`).
 
 ### 2. Add the Source Document
 Create the tutorial markdown file under the appropriate language and category directory. Use a three-digit index prefix for the filename:
-* Example: `zh/001-快速上手/002-了解沙箱环境.md`
+* Example: `en/001-Quick-Start/002-Understand-the-Sandbox-Environment.md`
 
 ### 3. Translate and Distribute
 Translate the newly added document into all other supported locales (`en`, `fr`, `ja`):
