@@ -3,7 +3,7 @@ You are now looking at a simple test markdown file.
 
 You can click "Send to AI" in the top right corner to send this file exactly as is to the AI and have them say hello to you!
 
-If you'd like, you can also edit this file and add some text introducing yourself:
+If you'd like, you can also click "Edit" on this file and add some text introducing yourself, for example:
 
 > Hello, I am...
 
