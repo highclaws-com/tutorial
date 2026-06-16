@@ -5,7 +5,7 @@ Click "Send to AI" to get information about the AI's working environment.
 
 ### Hardware Environment of the Sandbox
 Please check how much space is available for each of the following resources, and whether it is sufficient:
-* Available disk space in your workspace
+* Available disk space in your workspace (/worktrees)
 * Available memory (RAM)
 
 ### Software Tools of the Sandbox

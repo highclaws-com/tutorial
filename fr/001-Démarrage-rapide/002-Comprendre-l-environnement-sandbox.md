@@ -5,7 +5,7 @@ Cliquez sur « Envoyer à l'IA » pour obtenir des informations sur l'environnem
 
 ### Environnement matériel de la sandbox
 Veuillez vérifier l'espace disponible pour chacune des ressources suivantes et si cet espace est suffisant :
-* Espace disque disponible dans votre espace de travail
+* Espace disque disponible dans votre espace de travail (/worktrees)
 * Mémoire (RAM) disponible
 
 ### Outils logiciels de la sandbox
