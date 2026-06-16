@@ -12,8 +12,6 @@ The tutorials are organized by language codes, containing localized directories 
 * **[ja/](./ja)**: Japanese tutorials (e.g. `001-クイックスタート/`).
 * **[zh/](./zh)**: Chinese tutorials (e.g. `001-快速上手/`).
 
----
-
 ## How to Add a New Tutorial
 
 To add a new tutorial topic or category, follow these steps:
@@ -32,3 +30,7 @@ Translate the newly added document into all other supported locales (`en`, `fr`,
 * Translate the content while keeping the structure (like headings and formatting) identical.
 * Translate the filename to match the target language (e.g., `002-Understand-the-Sandbox-Environment.md` for English).
 * Place each translated file in its respective category directory (e.g. `en/001-Quick-Start/002-Understand-the-Sandbox-Environment.md`).
+
+## Deployment
+
+Only the `deploy` branch will be reflected on the website. To publish any new tutorials or changes to the website, ensure they are merged or pushed to the `deploy` branch.
