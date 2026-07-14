@@ -1,6 +1,11 @@
 {
   "en-US": "Quick Start",
-  "zh-CN": "快速上手",
+  "de-DE": "Schnellstart",
   "fr-FR": "Premiers pas",
-  "ja-JP": "はじめての方へ"
+  "zh-CN": "快速上手",
+  "zh-TW": "快速開始",
+  "ja-JP": "はじめての方へ",
+  "ko-KR": "빠른 시작",
+  "es-ES": "Inicio rápido",
+  "pt-BR": "Início rápido"
 }
