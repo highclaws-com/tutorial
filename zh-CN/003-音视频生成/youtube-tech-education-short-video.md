@@ -1,307 +1,412 @@
-# Remotion YouTube Short Technical-Education Video Workflow
+# YouTube Shorts Production Workflow
 
-**Purpose:** A reusable process for producing any concise technical-education video as a vertical YouTube Short with Remotion.
-
-**Default delivery:** `1080 × 1920`, `30 fps`, H.264 video + AAC audio.
-
-> **Workspace rule:** Keep the video project, dependencies, caches, source media, previews, and rendered outputs in a dedicated non-source workspace. Do not install dependencies or place render artefacts inside an application/source repository unless the user explicitly requests it.
+> **Purpose:** A portable, self-contained workflow for an AI agent to create a polished educational YouTube Short, iterate with a user, add Qwen3-TTS narration, and prepare a YouTube Studio draft.
+>
+> **Default deliverable:** English; under two minutes; 1080×1920 vertical; 30fps; H.264 video and AAC audio.
+>
+> **Principle:** Treat this document as a reusable production specification, not as a description of a particular user, machine, repository, previous project, URL, or existing file.
 
 ---
 
-## 1. Content contract before implementation
+## 0. Configure the run before creating files
 
-Create a `script.md` as the single source of truth before building the composition. Organize it into chapters. Each chapter should contain:
+At the start of a new Short, establish these values. Do not assume any already exist.
 
-- the learning objective;
-- on-screen title and concise supporting points;
-- visual plan (diagram, code excerpt, chart, demonstration, source clip, or UI);
-- exact voice-over text;
-- intended pacing and any required pause.
+| Variable | Meaning | Example |
+|---|---|---|
+| `<SHORTS_ROOT>` | Parent workspace for all Shorts | `/worktrees/youtube-shorts` |
+| `<TOPIC_ID>` | Next unused, zero-padded sequence number | `002` |
+| `<TOPIC_SLUG>` | Concise, lowercase, hyphenated topic name | `topic-foo` |
+| `<PROJECT_ROOT>` | Topic container directory; contains only the current `script.md` at its top level plus one `workspace/` directory | `<SHORTS_ROOT>/<TOPIC_ID>-<TOPIC_SLUG>` |
+| `<WORKSPACE>` | Everything other than scripts for this topic: renderer code, dependencies, assets, audio, previews, renders, manifests, notebooks, caches, and final output | `<PROJECT_ROOT>/workspace` |
+| `<CHANNEL>` | Target YouTube channel | Ask when unknown |
+| `<FILE_BROWSER_URL>` | Optional link base for a user-visible file browser | Deployment-specific |
 
-Use one narration audio file per chapter rather than one long audio file. This makes revisions, timing changes, and voice replacement tractable.
+If `<SHORTS_ROOT>` is not supplied or cannot be discovered, ask the user before creating files. Inspect the root before choosing `<TOPIC_ID>` so no existing project is overwritten.
 
-Suggested project layout:
+---
+
+## 1. Non-negotiable production rules
+
+1. **One topic, one self-contained project.**
+   - Create a fresh `<PROJECT_ROOT>` for each Short.
+   - Install renderer dependencies, virtual environments, assets, caches, audio, preview files, and final output inside that project only.
+   - Do not import from, build through, or share `node_modules`, Python environments, renderer caches, source code, or generated assets with another topic.
+   - A previous project may be studied as inspiration, but the new project must be independently runnable.
+
+2. **Script first; video second; narration third.**
+   - Do not begin visual production until the user has reviewed the script.
+   - Render and review a silent visual version before generating final narration.
+
+3. **English is the final script language.**
+   - A user may edit text in any language or add inline instructions such as `(remove this)` or `(rewrite this more directly)`.
+   - Interpret the intent, apply the edit, and preserve a fluent English script unless the user explicitly requests a different output language.
+
+4. **Be concise and compelling.**
+   - Keep the Short below two minutes unless the user requests otherwise.
+   - Open with the value, tension, surprising claim, or central question.
+   - Eliminate slow introductions, repeated conclusions, and filler.
+   - Be deliberately title-forward: use curiosity, contrast, urgency, and a strong opinion to earn attention.
+   - Optimize for clicks while keeping the central factual promise defensible; do not fabricate evidence, results, or capabilities.
+
+5. **Draft, never publish.**
+   - The final YouTube Studio action in this workflow is saving a correctly configured **Draft**.
+   - Do not make the video Public, Private, or Unlisted, and do not complete publication steps, unless the user explicitly changes this boundary.
+
+6. **Respect human attention and reading limits.**
+   - Design for what a person can actually notice, read, and understand while a scene is visible.
+   - A four-second beat can carry one short idea—not a heading, paragraph, labels, and animation.
+   - Treat the practical reason or use case as primary content, not as a footnote. Give it title-level hierarchy when it is the main takeaway.
+   - If motion already explains the mechanism, do not repeat it with explanatory text. Keep only the minimum words needed to establish purpose or consequence.
+   - Keep readable text static. Never move URLs, code, headers, or sentences that viewers must decode.
+
+7. **Do not accumulate versions.**
+   - Keep one current `<PROJECT_ROOT>/script.md` and edit it in place. Use source control when editorial history is needed.
+   - `<WORKSPACE>` is not an archive.
+   - Keep only the current implementation, current review preview, necessary assets, and final deliverables in `<WORKSPACE>`.
+   - When a new preview replaces an old one, delete the old preview, obsolete stills, temporary checks, and abandoned render variants after verification.
+   - Do not create `v1`, `v2`, or similarly versioned source/output trees inside `<WORKSPACE>` unless the user explicitly asks to preserve them.
+
+---
+
+## 2. Phase A — Receive the idea and write the first script
+
+### 2.1 Infer the brief from context
+
+A Short often begins after a useful discussion of a concept, rather than from a fully specified production brief. Use the current conversation as the source of truth for the topic, the important claims, the intended takeaway, and the appropriate depth.
+
+When the user asks to turn a discussed knowledge point into a Short, begin drafting immediately. Do **not** ask routine follow-up questions about audience, language, duration, visual style, evidence, or renderer. Make pragmatic defaults:
+
+- English output;
+- under two minutes;
+- a direct, title-forward educational hook;
+- the warm editorial field-note design system in this document;
+- the renderer best suited to the concept.
+
+Ask only when execution is genuinely blocked—for example, the conversation does not identify a topic at all, a required source/asset is inaccessible, or two incompatible interpretations would produce fundamentally different factual content.
+
+### 2.2 Create the project and script
+
+Create the current script at the topic-container level:
 
 ```text
-short-project/
-  script.md
-  src/
-    index.ts
-    Root.tsx
-    video.tsx
-  public/
-    clips/       # optional source videos/demos
-    images/      # diagrams, screenshots, illustrations
-    audio/       # one narration file per chapter
-  out/           # previews and final renders
-  package.json
-  tsconfig.json
+<PROJECT_ROOT>/script.md
 ```
 
-Use descriptive, topic-neutral filenames such as `chapter-01-intro.mp3`, `chapter-02-mechanism.mp3`, and `chapter-03-takeaway.mp3`.
+The topic-container level is reserved for scripts only. Do not create `<WORKSPACE>` yet; it begins only after script approval and visual production starts.
+
+Use this format:
+
+```markdown
+# <Short Title> — Script
+
+> **Status:** Working English script; revise until approved.
+> **Target duration:** <for example, 45–75 seconds; under two minutes>
+> **Tone:** Direct, concise, lightly playful
+> **Timing note:** Section lengths are approximate planning estimates. Actual sequence timing is finalized after visual iteration and measured narration audio.
 
 ---
 
-## 2. Build the Remotion project in the workspace
+## 1. Hook — ~6 seconds
 
-Install dependencies from the dedicated project directory:
+**On screen**
+- Title: `...`
+- Visual: `...`
 
-```bash
-cd /path/to/dedicated-workspace/short-project
-npm install --include=optional
-```
-
-`--include=optional` matters on Linux because Remotion's compositor/FFmpeg-related optional packages may otherwise be absent. A missing package can appear only after rendering all frames, during encoding.
-
-Keep Remotion, React, TypeScript, and renderer package versions aligned in `package.json` and commit the lockfile for reproducibility.
+**Voice-over**
+> ...
 
 ---
 
-## 3. Define a vertical composition
+## 2. <Key idea> — ~12 seconds
 
-Declare the Short explicitly in `src/Root.tsx`:
+**On screen**
+- ...
 
-```tsx
-<Composition
-  id="TechNoteShort"
-  component={TechNoteShort}
-  durationInFrames={durationInFrames}
-  fps={30}
-  width={1080}
-  height={1920}
-/>
+**Voice-over**
+> ...
+
+---
+
+## 3. Takeaway — ~8 seconds
+
+**On screen**
+- ...
+
+**Voice-over**
+> ...
 ```
 
-Compute the duration from the real chapter timing:
+The script must include:
+
+- numbered sections;
+- approximate per-section durations, not exact start/end timestamps;
+- concise on-screen direction;
+- exact voice-over wording;
+- a direct hook and useful takeaway;
+- enough visual detail for a renderer to implement the Short without guessing.
+
+### 2.3 Hand off for script review
+
+After the script is written, reply with:
+
+1. the absolute script path; and
+2. a file-browser preview link if the environment provides a file browser.
+
+Do not invent a link format. Build it from the runtime’s documented file-browser URL and path rules, or omit the link if none is available.
+
+---
+
+## 3. Phase B — Review and revision loop
+
+The user may edit `script.md` directly or give instructions in chat.
+
+For each review round:
+
+1. Read the newest script and identify all replacements, deletions, annotations, and structural changes.
+2. Interpret instructions in any language.
+3. Rewrite the result as natural English while retaining the required approximate section-duration, **On screen**, and **Voice-over** structure.
+4. Patch `<PROJECT_ROOT>/script.md` in place. Do not create numbered script copies.
+5. Briefly state what changed and share the script path and file-browser link when available.
+
+Continue until the user clearly approves video production. Do not treat silence as approval.
+
+---
+
+## 4. Phase C — Select the right renderer
+
+Choose the renderer based on what must be taught, not on habit. If uncertain, recommend one with a one-sentence reason and allow the user to choose differently.
+
+| Renderer | Choose it for | Strength |
+|---|---|---|
+| **Remotion** | Engineering explainers, product/UI walkthroughs, architecture, code/configuration, charts, reusable templates, and media composition | React/TypeScript components, deterministic timelines, maintainability, and browser-oriented debugging |
+| **Manim** | Equations, proofs, coordinate systems, geometry, vectors, algorithms, mathematical transformations, and rigorous scientific mechanisms | Semantic mathematical APIs for objects, axes, formulas, transformations, and independently renderable scenes |
+| **HyperFrames** | HTML/CSS/JavaScript motion design, expressive graphic packaging, animation-heavy cards, and frame-precise composition | HTML composition model with seek-safe, frame-oriented animation; can combine with GSAP for explicit timelines and keyframes |
+
+### Required skill-loading discipline
+
+Before implementation, load the relevant available skills rather than relying on memory:
+
+- For **Manim**, load `manim-video`. Follow its plan → code → low-quality render → review → final-render workflow.
+- For **HyperFrames**, load `hyperframes` first. Follow its routing/install instructions and load the related core, animation, keyframes, creative, and CLI skills that it requires.
+- For **Remotion**, load any available Remotion or technical-explainer skill. Use local composition registration, TypeScript checks, frame/studio preview, deterministic rendering, and media probing.
+
+If a named skill is unavailable, use the renderer’s official documentation and retain the same verification discipline.
+
+---
+
+## 5. Phase D — Design system: warm editorial field-note style
+
+This style specification is self-contained. Apply it by default unless the user supplies a different brand or art direction.
+
+### Visual identity
+
+Create a warm, polished, editorial technical video—not a default blue/purple AI template, not an unstyled slide deck, and not a crowded dashboard.
+
+### Terminology Abstraction (MANDATORY)
+
+- **NEVER use internal business terminology** (e.g., "Sandbox", "Gateway", "Step CA") in the script or visual assets.
+- ALWAYS abstract concepts to universally understood architectural terms (e.g., "Dynamic Node", "API Proxy", "Internal CA"). Educational content must be broadly applicable, not tied to a specific company's internal infrastructure naming.
+
+### Palette
+
+| Role | Color |
+|---|---|
+| Cream background | `#FFF6E6` |
+| Paper/card surface | `#FFFDF8` |
+| Ink text and dark media base | `#2D241F` |
+| Primary orange | `#F26A21` |
+| Tangerine highlight | `#FF9E2C` |
+| Peach support/accent | `#FFE0B5` |
+| Rust emphasis | `#9E3E18` |
+| Muted teal contrast | `#156B67` |
+| Soft gray secondary text | `#75665B` |
+
+### Layout and background
+
+- Use a clean cream canvas.
+- **STRICTLY VERTICAL (9:16) TOP-DOWN FLOW**: You are building for a 1080x1920 portrait screen. **NEVER use left-right (horizontal) Flexbox layouts** (`flexDirection: "row"`). All elements, boxes, and sequence diagrams must flow strictly top-to-bottom (`flexDirection: "column"`).
+- **ARROWS MUST POINT DOWN**: Any diagram connecting nodes must use Down Arrows (`⬇️`), never Right Arrows.
+- **FILL THE ENTIRE SCREEN**: Do not leave the bottom half of the screen empty. Use `justifyContent: "space-between"`, massive `gap` values (e.g., 60px - 100px), and oversized components to stretch the layout vertically from the very top to the very bottom.
+- Add at most one or two oversized, low-opacity peach/orange circular accents.
+- Add a thin orange rule along the top when it supports the composition.
+- Use one dominant idea and one focal visual per scene.
+
+### Typography
+
+- **MASSIVE FONTS**: Set titles to at least `72px+` and paragraph/label texts to `42px+`. Make them bold and unmissable on mobile screens.
+- Use bold, high-contrast sans-serif titles.
+- Use restrained monospace type for technical labels, compact badges, counters, framework names, and footer notes.
+- Use strong wrapping rules and generous line height; never allow text to extend beyond safe margins.
+- Prefer short headlines and concise bullets over paragraphs.
+
+### Cards, panels, and media windows
+
+- Use off-white paper surfaces with rounded corners.
+- Use a 2–5 px semantic-color border.
+- Use only subtle, low-opacity warm shadows.
+- Use upright horizontal rounded-rectangle media windows with thin accent borders and a small browser-style label bar when presenting video/code/UI.
+- Do **not** use tilted cards, skewed windows, heavy shadows, glassmorphism, decorative diagonal lines, or unnecessary perspective effects.
+
+### Information hierarchy and motion
+
+- Use a small chapter badge, large headline, primary visual, explanatory card, and quiet footer/field-note summary where appropriate.
+- Use `01`, `02`, `03`-style bullets when a list is needed.
+- Use brief field-note summaries such as `FIELD NOTE → ...` rather than dense closing paragraphs.
+- Animate with subtle fade/vertical spring entrances, light staggering, clean transitions, and intentional pauses.
+- Motion should reveal hierarchy and sequence; it should never compete with the explanation.
+
+### Attention budget
+
+- Give every scene one dominant takeaway.
+- Match copy length to screen time. For a roughly four-second beat, prefer one immediately readable phrase or a very short sentence.
+- When the use case is the lesson, size it like a headline; do not demote it to small footer text.
+- Remove secondary labels, mechanism descriptions, status codes, and protocol detail unless they are necessary to understand the lesson.
+- Review the scene at playback speed, not only as a still frame. If the eye must choose between reading and following motion, simplify the scene.
+
+---
+
+## 6. Phase E — Build a topic-local video project
+
+Create exactly one production workspace inside the topic container. The topic root holds only the current `script.md` and `workspace/`; **every other file or directory** belongs inside `workspace/`.
+
+For example:
 
 ```text
-durationInFrames = totalSeconds × fps
+<SHORTS_ROOT>/123-topic-baz/
+├── script.md
+└── workspace/
+    └── <all implementation material for this topic>
 ```
 
-Do not keep an old hard-coded duration after replacing narration. The composition must end only after the final audio has completed and the final takeaway has remained readable.
+`workspace/` is the sole working directory for production. Nothing except `script.md` and `workspace/` may live at `<PROJECT_ROOT>`.
+
+Inside `workspace/`, use whatever file and subtree names suit the chosen renderer and topic. There is **no required internal directory schema**. For example, a project may use `src/`, `public/`, `audio/`, `previews/`, `out/`, `final/`, a narration manifest, a Jupyter notebook, `node_modules/`, `.venv/`, cache directories, or differently named equivalents. The only invariant is that all source, dependencies, assets, audio, previews, outputs, final video, notebooks, caches, and every other implementation artifact remain somewhere under `<WORKSPACE>`.
+
+This flexibility does **not** mean retaining every iteration. Use stable current-output names and delete superseded numbered outputs immediately after the replacement is verified. Keep history in source control when needed, not in duplicate workspace media or source trees.
+
+Do not create a second project container such as `project/` or `short-project/` inside `workspace/`; `workspace/` itself is the production root.
+
+Rules:
+
+- Install all dependency manifests, packages, virtual environments, and renderer tools inside `<WORKSPACE>`.
+- Keep all generated production files under `<WORKSPACE>`.
+- Do not use shared or inherited build state.
+- Default to **1080×1920, 30fps, H.264** for silent and final video unless the user requests another format.
+
+### Silent-first delivery
+
+1. Implement the Short from the approved script.
+2. Render a silent preview.
+3. Verify dimensions, FPS, codec/container, and duration with `ffprobe`.
+4. Inspect representative frames and/or play the result to check text size, safe margins, crop, overlap, transitions, timing, and whether the copy is realistically readable at playback speed.
+5. Share the preview path and a file-browser link when available.
+6. After the replacement is verified, remove superseded previews, obsolete stills, and temporary review renders from `<WORKSPACE>`.
+
+Do not generate final narration while the visual direction is still changing unless the user explicitly requests combined iteration.
 
 ---
 
-## 4. Design for a phone screen
+## 7. Phase F — Visual convergence
 
-### Safe layout
+Use the user’s feedback to refine the silent version.
 
-Use explicit horizontal bounds for all text and key content:
+For every revision:
 
-```tsx
-const WRAP: React.CSSProperties = {
-  overflowWrap: 'break-word',
-  wordBreak: 'normal',
-};
+1. Update the current script revision when speech or on-screen content changes.
+2. Update topic-local source and assets.
+3. Re-render the changed composition.
+4. Re-check visual hierarchy, legibility, vertical safe areas, attention load at playback speed, and technical output.
+5. Share the replacement preview.
+6. Delete the preview and review artifacts that the replacement supersedes; retain only the current reviewable output.
 
-<div style={{
-  position: 'absolute',
-  left: 60,
-  right: 60,
-  bottom: 110,
-  ...WRAP,
-}}>
-  Important takeaway
-</div>
-```
-
-Recommended working margins for a 1080×1920 composition:
-
-```text
-left/right: 60 px minimum
-bottom: 95 px minimum
-```
-
-Keep important controls, captions, and conclusions farther from the right and bottom edges, where platform UI may overlap the video.
-
-### Information density
-
-- Prefer one idea per screen.
-- Keep titles to roughly two lines.
-- Put related elements into explicit vertical regions: title, visual, explanation, takeaway.
-- Do not stack absolutely positioned blocks into the same vertical region.
-- Use a readable sans-serif body font; use a monospaced font only for code, commands, labels, or values that benefit from it.
-- Favor contrast and legibility over decorative effects.
-
-### Source-video or screenshot windows
-
-When embedding media as evidence or an example:
-
-- use a horizontal, unrotated rounded rectangle;
-- keep the border and shadow subtle;
-- never rely on skewed frames, diagonal masks, or heavy shadows for meaning;
-- preserve enough area for surrounding commentary;
-- use `objectFit: 'cover'` only when cropping does not hide material facts.
-
-For multiple source windows on a vertical Short, use a vertical sequence or an edited comparison rather than forcing tiny horizontal columns.
+Proceed to narration only after the user confirms that the silent video has converged.
 
 ---
 
-## 5. Implement a deterministic timeline
+## 8. Phase G — Generate narration with Qwen3-TTS CustomVoice
 
-Use Remotion's frame-based primitives:
+### Recommended configuration
 
-- `useCurrentFrame()` for the current frame;
-- `interpolate()` for continuous values such as opacity and position;
-- `spring()` for modest entrances;
-- `Sequence` for chapter placement;
-- `Audio` for narration; and
-- `Video`, `Img`, SVG, or HTML/CSS for visuals.
+- Model: `Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice`
+- **Preferred speaker:** `Ryan` for English narration, when the installed model exposes it.
+- **Fallback speaker:** select another supported voice that fits the requested language and tone when `Ryan` is unavailable; record the actual selection in the narration manifest.
+- Language: `English` by default; use the approved script language when different.
+- Precision: `torch.bfloat16`
+- Attention implementation: `sdpa`
+- Style instruction: `Speak clearly, warmly, and with an upbeat technical-demo tone.`
 
-Place the visual and its narration at the same chapter start frame:
+### Create a narration manifest
 
-```tsx
-<Sequence from={chapterStart} durationInFrames={chapterDuration}>
-  <ChapterVisual />
-</Sequence>
-
-<Sequence from={chapterStart} durationInFrames={chapterDuration}>
-  <Audio src={staticFile('audio/chapter-02.mp3')} />
-</Sequence>
-```
-
-Timeline rules:
-
-1. Measure each generated audio file before finalizing chapter duration.
-2. Allocate each chapter enough frames for its full narration plus a natural end hold.
-3. Recompute every later chapter start when an earlier narration changes.
-4. Keep the final conclusion visible for at least 1–2 seconds after it has appeared, where pacing allows.
-5. Never use wall-clock time, `setTimeout()`, unbounded loops, or uncontrolled playback state for render-critical animation.
-
-A small, controlled entrance movement is usually enough. Animation should clarify the explanation, not compete with it.
-
----
-
-## 6. TTS workflow and audio verification
-
-Choose the requested voice provider and use a consistent voice across the whole Short unless the script intentionally calls for multiple speakers.
-
-For each chapter:
-
-1. Generate the exact text from `script.md`.
-2. Verify the generated asset exists locally.
-3. Confirm it contains audible, non-silent samples.
-4. Measure its real duration.
-5. Copy it into `public/audio/` with a stable filename.
-6. Update the chapter start/duration and composition end from those measurements.
-
-Never store API keys, passwords, tokens, or voice-provider credentials in source code, documentation, command history, or chat. Use secure environment injection or the provider's authenticated browser flow. In documentation, represent all credentials as `[REDACTED]`.
-
-Useful duration check:
-
-```bash
-ffprobe -v error \
-  -show_entries format=duration,size \
-  -of json public/audio/chapter-02.mp3
-```
-
-When replacing a voice, regenerate every affected chapter and verify that no old clips remain mixed into the render.
-
----
-
-## 7. QA before the full render
-
-Run TypeScript validation first:
-
-```bash
-npx tsc --noEmit
-```
-
-Render stills at representative frames:
-
-```bash
-npx remotion still src/index.ts TechNoteShort out/qa-opening.png --frame=30
-npx remotion still src/index.ts TechNoteShort out/qa-middle.png --frame=450
-npx remotion still src/index.ts TechNoteShort out/qa-ending.png --frame=900
-```
-
-Inspect these images for:
-
-- title wrapping and screen-edge overflow;
-- collisions between text, diagrams, media windows, and captions;
-- code or diagram readability at phone scale;
-- unintended black frames or missing assets;
-- correct final frame and end-card hold.
-
-Then render the complete video. A conservative Linux render command is:
-
-```bash
-npx remotion render src/index.ts TechNoteShort \
-  out/tech-note-short.mp4 \
-  --codec=h264 \
-  --pixel-format=yuv420p \
-  --concurrency=1
-```
-
-`--concurrency=1` is slower but can be more reliable for compositions with multiple video tracks or constrained resources.
-
----
-
-## 8. Verify the encoded deliverable
-
-Validate the actual MP4 rather than assuming a successful command is sufficient:
-
-```bash
-ffprobe -v error \
-  -show_entries format=duration,size:stream=codec_name,codec_type,width,height,r_frame_rate \
-  -of json out/tech-note-short.mp4
-```
-
-Expected essentials:
+Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 
 ```json
 {
-  "video": "h264",
-  "audio": "aac",
-  "width": 1080,
-  "height": 1920,
-  "r_frame_rate": "30/1"
+  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice",
+  "speaker": "<selected supported speaker; Ryan when available>",
+  "language": "<approved script language>",
+  "instruction": "Speak clearly, warmly, and with an upbeat technical-demo tone.",
+  "clips": [
+    {
+      "id": "hook",
+      "file": "hook.wav",
+      "text": "Exact approved narration goes here."
+    }
+  ]
 }
 ```
 
-Extract and inspect at least opening, middle, and final frames:
+### Generating Continuous TTS (Fixing Attention Decay via DRC)
 
-```bash
-ffmpeg -y -ss 1  -i out/tech-note-short.mp4 -frames:v 1 out/qa-opening.jpg
-ffmpeg -y -ss 15 -i out/tech-note-short.mp4 -frames:v 1 out/qa-middle.jpg
-ffmpeg -y -ss 30 -i out/tech-note-short.mp4 -frames:v 1 out/qa-ending.jpg
-```
+> **CRITICAL TTS RULE:** Generating a single extremely long text string in neural TTS models (like Qwen3-TTS) often leads to **Attention Decay** where the volume fades out toward the end. However, manually splitting the audio breaks natural prosody and breath pacing.
+> 
+> **SOLUTION:** Always use **End-to-End (E2E) single-clip generation** to preserve the emotional flow, and then use **FFmpeg Dynamic Range Compression (Loudness Normalization)** to mathematically fix the volume drop.
 
-Also listen to the final seconds of the finished MP4. A valid AAC track does not prove that the final sentence was not cut off.
+1. **Consolidate Script**: Define exactly one clip in `narration-manifest.json` containing the entire script (e.g., `full_script`).
+2. **Generate E2E Audio**: Run the generation script. This outputs `narration_full_raw.wav` with perfect prosody but fading volume.
+3. **Apply Loudness Normalization**: Use FFmpeg's `loudnorm` filter (EBU R128) to dynamically boost quiet parts and compress loud parts, resulting in a perfectly leveled final audio file.
+   ```bash
+   ffmpeg -y -i audio/narration_full_raw.wav -af "loudnorm=I=-14:LRA=11:TP=-1.5" audio/narration_full.wav
+   ```
+
+> **CRITICAL RULE FOR TTS SCRIPTING:** The spoken language generated by the TTS must closely match the text displayed on the visual slides. Avoid unnecessary verbosity or divergent phrasing. Keep the narration concise and tightly aligned with the on-screen keywords so the viewer can effortlessly connect the audio with the visuals.
+
+> **TTS PRONUNCIATION FIXES:** If your script contains hyphenated acronyms or code variables (e.g., `proxy-ssl-ca`), the TTS model may choke, mispronounce, or terminate early. You MUST rewrite these phonetically in the JSON manifest (e.g., `proxy S S L C A`) to ensure flawless audio generation.
+
+### Audio-Visual Sync via Whisper (MANDATORY)
+
+Naive silence detection (`pydub.silence.detect_nonsilent`), character-based math, and audio-splicing are extremely fragile and MUST NOT BE USED. You must strictly use Speech-to-Text reverse alignment for industrial-grade synchronization.
+
+1. **Install & Cache-First Whisper**: You MUST use OpenAI Whisper (`pip install openai-whisper`) for timestamp extraction. Before deciding on a model size (`tiny.en`, `base.en`, etc.), you MUST check the local cache (e.g., `~/.cache/whisper/`) and strictly prefer a model that is already downloaded to save bandwidth and time. Do NOT attempt to build custom silence-chunking fallback logic.
+2. **NO OVER-ENGINEERING**: Do NOT write complex Python scripts with "sliding window matching" or automated text-search algorithms to parse the Whisper output. This is prone to edge-case failures.
+3. **Manual LLM-in-the-Loop Alignment**: Let the AI agent simply run a tiny script to print the `whisper` transcript with timestamps to the console, and visually read the output to identify the exact start times of the scenes.
+4. **Frame Calculation & Hardcoding**: The AI agent will manually convert these timestamps to frame offsets (e.g., `seconds * 30 fps`) and hardcode them into the `FRAMES` constants in the React file using standard file replacement tools.
+5. **Single Audio Element**: Ensure the Remotion composition only has one root `<Audio src={...narration_full.wav} />` component.
+
+### Validate and Render
+
+1. Verify `narration_full.wav` exists in `<WORKSPACE>/audio/`.
+2. Probe the file: valid decode, correct length, and non-silent samples.
+3. Render the narrated video and verify the expected streams, dimensions, FPS, duration, and audio/video synchronization.
 
 ---
 
-## 9. Common failures and fixes
+## 9. Phase H — Final review and YouTube Studio Draft
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Render completes frames but fails while encoding | Linux optional renderer dependency missing | Run `npm install --include=optional` in the project directory, then re-render. |
-| TypeScript passes but MP4 fails | Still render and final encoder use different paths | Always perform a complete render and inspect it with `ffprobe`. |
-| Final sentence is cut off | Composition or final `Sequence` is shorter than narration | Measure the final audio, extend the sequence and total composition, and add an end hold. |
-| Chapters have awkward silence | Later `Sequence from` values were inherited from a previous narration version | Recalculate all starts from the current real audio durations. |
-| Video is not vertical | Composition retained horizontal dimensions | Set `width={1080}` and `height={1920}` and confirm with `ffprobe`. |
-| Source media cannot load | Asset lives outside Remotion `public/` | Copy/prepare it under `public/` and reference it with `staticFile()`. |
-| Long English technical text overflows | Fixed font size without a bounded width | Set `left` and `right`, enable wrapping, shorten copy, or reduce font size only after preserving hierarchy. |
-| Text blocks overlap | Absolute elements share the same vertical region | Create a region plan and assign distinct height ranges before styling. |
-| On-screen details are too small | Horizontal design was shrunk into a Short | Recompose for vertical reading: one primary visual, fewer simultaneous points. |
-| Render is unstable | Too many heavy media tracks render concurrently | Lower concurrency; trim or proxy assets if necessary. |
-| TTS voice changes unexpectedly | Only some clips were regenerated | Audit every file in `public/audio/` before delivery. |
-| Credentials leaked | A key was pasted into code, docs, logs, or chat | Revoke/rotate it, remove the leak, and use `[REDACTED]` in records. |
+After the user approves the narrated final:
 
----
+1. Verify the exact final MP4 locally: it exists, is non-empty, decodes, and has expected video/audio streams.
+2. If the destination channel is unknown, ask the user which channel to use.
+3. Propose a direct, attractive, truthful title and a one-line subtitle/description. Use user-supplied wording exactly when given.
+4. Follow the runtime’s documented browser-upload procedure and browser-visible path mapping.
+5. Confirm YouTube Studio accepts the exact file and completes relevant processing before editing metadata.
+6. Set and verify:
+   - title;
+   - subtitle/description;
+   - required audience declaration (ask when unknown; never infer it);
+   - requested playlist or additional metadata.
+7. Save the upload as a **Draft**.
+8. Verify the channel content list shows the expected title, Draft state, and duration.
+9. Tell the user the draft is ready and explicitly hand off all remaining Studio steps.
 
-## 10. Final delivery checklist
-
-- [ ] Project, dependencies, caches, media, and outputs live in a dedicated workspace.
-- [ ] `script.md` is current and matches every voice-over line.
-- [ ] `npx tsc --noEmit` passes.
-- [ ] Representative opening, middle, and ending stills were checked.
-- [ ] Every narration file has been measured with `ffprobe`.
-- [ ] Visual and audio sequences share the same chapter starts.
-- [ ] All chapter starts were recalculated after the latest TTS change.
-- [ ] The final narration plays fully, followed by a readable end hold.
-- [ ] Canvas is 1080×1920 at 30 fps.
-- [ ] The final MP4 is verified as H.264 video + AAC audio.
-- [ ] Finished MP4 frames contain no overflow, overlap, missing asset, or black-frame defect.
-- [ ] Voice identity is consistent across all clips unless intentionally varied.
-- [ ] No credential appears in the project, docs, logs, or deliverables.
+Do not continue to visibility settings, publication, scheduling, or release without a new explicit instruction.
