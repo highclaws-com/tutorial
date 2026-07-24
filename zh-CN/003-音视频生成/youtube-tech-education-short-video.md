@@ -56,16 +56,19 @@ If `<SHORTS_ROOT>` is not supplied or cannot be discovered, ask the user before 
 6. **Respect human attention and reading limits.**
    - Design for what a person can actually notice, read, and understand while a scene is visible.
    - A four-second beat can carry one short idea—not a heading, paragraph, labels, and animation.
+   - **NO METAPHORS (MANDATORY):** Never use analogies, metaphors, or childish comparisons (e.g., restaurants, leaky buckets, waiting rooms, highways). Explain the actual technical mechanism directly, literally, and professionally. Your audience consists of engineers.
+   - **LITERAL STATE REPRESENTATION**: Instead of analogies, explain processes using literal representations of system assets—such as sequence flowcharts, database row states, configuration payloads, or strict API protocols.
    - Treat the practical reason or use case as primary content, not as a footnote. Give it title-level hierarchy when it is the main takeaway.
    - If motion already explains the mechanism, do not repeat it with explanatory text. Keep only the minimum words needed to establish purpose or consequence.
    - Keep readable text static. Never move URLs, code, headers, or sentences that viewers must decode.
 
-7. **Do not accumulate versions.**
+7. **DO NOT ACCUMULATE VERSIONS (STRICT NO-VERSIONING RULE).**
+   - **CRITICAL:** NEVER create `v1`, `v2`, `v3`, or similarly versioned files for large media (like MP4s, WAVs, or project directories). 
+   - Users DO NOT like large files taking up disk space. Always OVERWRITE the existing file.
    - Keep one current `<PROJECT_ROOT>/script.md` and edit it in place. Use source control when editorial history is needed.
    - `<WORKSPACE>` is not an archive.
    - Keep only the current implementation, current review preview, necessary assets, and final deliverables in `<WORKSPACE>`.
-   - When a new preview replaces an old one, delete the old preview, obsolete stills, temporary checks, and abandoned render variants after verification.
-   - Do not create `v1`, `v2`, or similarly versioned source/output trees inside `<WORKSPACE>` unless the user explicitly asks to preserve them.
+   - When a new preview replaces an old one, immediately OVERWRITE or DELETE the old preview, obsolete stills, temporary checks, and abandoned render variants.
 
 ---
 
@@ -227,15 +230,20 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - Use a clean cream canvas.
 - **STRICTLY VERTICAL (9:16) TOP-DOWN FLOW**: You are building for a 1080x1920 portrait screen. **NEVER use left-right (horizontal) Flexbox layouts** (`flexDirection: "row"`). All elements, boxes, and sequence diagrams must flow strictly top-to-bottom (`flexDirection: "column"`).
 - **ARROWS MUST POINT DOWN**: Any diagram connecting nodes must use Down Arrows (`⬇️`), never Right Arrows.
-- **SAFE ZONE ALIGNMENT (NO BOTTOM OVERLAP)**: YouTube Shorts have massive UI widgets (avatar, like button, title description, progress bar) covering the bottom 20-30% of the screen. **NEVER use `justifyContent: "space-between"` or `marginBottom` to push content to the bottom**. ALWAYS use `justifyContent: "flex-start"` combined with massive `gap` values (e.g., 60px - 100px) so the layout flows top-down and naturally rests in the upper/middle safe zone, leaving the bottom empty.
-- Add at most one or two oversized, low-opacity peach/orange circular accents.
-- Add a thin orange rule along the top when it supports the composition.
+- **SAFE ZONE ALIGNMENT**: All elements must be spread evenly across the page. Most of the time, distribute them evenly (e.g., `justifyContent: "space-evenly"` or `"space-between"`). Only when there is truly very little content should you consider putting components at the top of the screen (`justifyContent: "flex-start"`), but even in that case, `center` is still usually better!
+- **STEP TIMELINE INDICATORS**: For multi-step architectures or timelines, add a clean stage-indicator badge at the top (e.g., `STEP 1: DUAL TRUST 👥` or `STEP 4: CLEANUP 🧹`) to visually chunk the flow.
+- **VERTICAL CANVAS SPACE BUDGET**: The 1080x1920 portrait canvas is narrow and height-constrained. Keep flow diagrams to a maximum of 3 vertical components (e.g., Node ➔ Arrow ➔ Node). Compress component paddings/margins to prevent elements from colliding or rendering out-of-screen.
+- **TRANSITION FLASH PROTECTION**: Never leave the canvas completely blank or empty at the start of a scene transition. Ensure structural host nodes (like headers or system actors) enter immediately at `frame 0` of the sequence, reserving delayed entrance transitions (e.g. `frame - 10`) exclusively for transient data packets or success banners.
+- **BRAND SIGNATURE FRAMING (MANDATORY)**: To establish visual identity across all videos in the channel:
+  - Add a static, 20px-height primary orange rule (`backgroundColor: PALETTE.primaryOrange`) absolute-positioned at the very top of the screen (`top: 0, left: 0, right: 0`) across all frames.
+  - Layer exactly two low-opacity (`0.5-0.6`), oversized (1000px-1200px) radial-gradient peach/orange circular accents (`background: radial-gradient(...)`) at the top-left (`top: -300px, left: -300px`) and bottom-right (`bottom: -250px, right: -250px`) to give the cream canvas depth.
 - Use one dominant idea and one focal visual per scene.
 
 ### Typography
 
 - **MASSIVE FONTS**: Set titles to at least `72px+` and paragraph/label texts to `42px+`. Make them bold and unmissable on mobile screens.
 - Use bold, high-contrast sans-serif titles.
+- **EMOJI INJECTIONS**: Intentionally place 1-2 expressive emojis in slide titles (e.g., `TRAP 🚨`, `RENEWAL ⏳`, `COMPLETED 🛡️`) and key diagram nodes to reduce visual dullness and enhance graphic energy.
 - Use restrained monospace type for technical labels, compact badges, counters, framework names, and footer notes.
 - Use strong wrapping rules and generous line height; never allow text to extend beyond safe margins.
 - Prefer short headlines and concise bullets over paragraphs.
@@ -246,6 +254,8 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - Use a 2–5 px semantic-color border.
 - Use only subtle, low-opacity warm shadows.
 - Use upright horizontal rounded-rectangle media windows with thin accent borders and a small browser-style label bar when presenting video/code/UI.
+- **CODE BLOCKS WITH OS WINDOW HEADERS**: Render code blocks (JSON, YAML) with a dark window header featuring macOS-style buttons (red, yellow, green window dots) and a clear, descriptive monospace label (e.g., `JSON_RPC_PAYLOAD`).
+- **FULL CONTEXT FOR TOOL CALLS**: When rendering API payloads or tool call JSONs, don't just dump the raw arguments. Wrap it in a proper response structure (like `{"role": "assistant", "tool_calls": [...]}`) so the viewer understands the context of the JSON block.
 - Do **not** use tilted cards, skewed windows, heavy shadows, glassmorphism, decorative diagonal lines, or unnecessary perspective effects.
 - **CODE BLOCKS MUST PRESERVE WHITESPACE:** When rendering code (e.g., YAML config, bash scripts) inside a React `div`, you MUST apply `whiteSpace: "pre-wrap"` and `textAlign: "left"` to the container. Furthermore, NEVER use HTML entities (like `&#10;`) in JSX string literal props. ALWAYS pass multi-line code using Javascript string escapes or template literals (e.g., `code={"deploy:\n  mode: global"}`). Otherwise, standard HTML flow will collapse all your beautiful YAML indentation and newlines into a single unreadable line!
 
@@ -253,6 +263,7 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 
 - Use a small chapter badge, large headline, primary visual, explanatory card, and quiet footer/field-note summary where appropriate.
 - Use `01`, `02`, `03`-style bullets when a list is needed.
+- **PUNCHY ONE-SENTENCE SUMMARY**: Inside the `FIELD NOTE` summary box at the end, use a single, highly memorable, punchy takeaway sentence to maximize audience recall and summarize the core engineering design heuristic (e.g. `FIELD NOTE ➔ "Never deploy without a fallback route"`).
 - Use brief field-note summaries such as `FIELD NOTE → ...` rather than dense closing paragraphs.
 - Animate with subtle fade/vertical spring entrances, light staggering, clean transitions, and intentional pauses.
 - Motion should reveal hierarchy and sequence; it should never compete with the explanation.
@@ -376,6 +387,8 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 > **TTS PRONUNCIATION FIXES:** If your script contains hyphenated acronyms or code variables (e.g., `proxy-ssl-ca`), the TTS model may choke, mispronounce, or terminate early. You MUST rewrite these phonetically in the JSON manifest (e.g., `proxy S S L C A`) to ensure flawless audio generation.
 
 ### Audio-Visual Sync via Whisper (MANDATORY)
+
+- **INTEGRATED PIPELINE EXECUTION**: Always build an all-in-one automation script (e.g. `generate_tts.py`) that encapsulates voice generation, loudness normalization, and Whisper timestamp transcription in a single step. This keeps the asset workspace robust and makes timestamps instantly reviewable in a single console log.
 
 Naive silence detection (`pydub.silence.detect_nonsilent`), character-based math, and audio-splicing are extremely fragile and MUST NOT BE USED. You must strictly use Speech-to-Text reverse alignment for industrial-grade synchronization.
 
