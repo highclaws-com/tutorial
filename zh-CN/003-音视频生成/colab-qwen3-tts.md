@@ -95,7 +95,7 @@ display(Audio(wavs[0], rate=sample_rate))
 
 Colab 左侧 **Files → 文件右侧 ⋮ → Download** 是正常的人工下载路径。
 
-但在自动化环境中，浏览器原生下载可能无法被工具可靠地接收/保存到沙盒；`google.colab.files.download()` 同样会触发浏览器端下载。因此，更可靠的中转方式是挂载 Google Drive，然后复制文件到 My Drive。
+但在自动化环境中，浏览器原生下载可能无法被工具可靠地接收/保存到沙箱；`google.colab.files.download()` 同样会触发浏览器端下载。因此，更可靠的中转方式是挂载 Google Drive，然后复制文件到 My Drive。
 
 ### 1. 挂载 Google Drive
 
