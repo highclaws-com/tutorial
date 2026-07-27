@@ -241,7 +241,7 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 
 ### Typography
 
-- **MASSIVE FONTS**: Set titles to at least `72px+` and paragraph/label texts to `42px+`. Make them bold and unmissable on mobile screens.
+- **MASSIVE FONTS**: Set titles to at least `80px-90px+` and paragraph/label/code/diagram texts to at least `48px-68px+` (at least 4 times larger than desktop defaults). Make them bold, massive, and unmissable on mobile screens.
 - Use bold, high-contrast sans-serif titles.
 - **EMOJI INJECTIONS**: Intentionally place 1-2 expressive emojis in slide titles (e.g., `TRAP 🚨`, `RENEWAL ⏳`, `COMPLETED 🛡️`) and key diagram nodes to reduce visual dullness and enhance graphic energy.
 - Use restrained monospace type for technical labels, compact badges, counters, framework names, and footer notes.
