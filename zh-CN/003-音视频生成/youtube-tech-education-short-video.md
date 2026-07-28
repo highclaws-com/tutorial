@@ -230,7 +230,7 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - Use a clean cream canvas.
 - **STRICTLY VERTICAL (9:16) TOP-DOWN FLOW**: You are building for a 1080x1920 portrait screen. **NEVER use left-right (horizontal) Flexbox layouts** (`flexDirection: "row"`). All elements, boxes, and sequence diagrams must flow strictly top-to-bottom (`flexDirection: "column"`).
 - **ARROWS MUST POINT DOWN**: Any diagram connecting nodes must use Down Arrows (`⬇️`), never Right Arrows.
-- **SAFE ZONE ALIGNMENT**: All elements must be spread evenly across the page. Most of the time, distribute them evenly (e.g., `justifyContent: "space-evenly"` or `"space-between"`). Only when there is truly very little content should you consider putting components at the top of the screen (`justifyContent: "flex-start"`), but even in that case, `center` is still usually better!
+- **FULL-SCREEN SPREAD (MANDATORY)**: Do NOT cram elements at the top of the screen! **NEVER** use `justifyContent: "flex-start"` unless a slide is intentionally mostly empty. You MUST spread all elements evenly across the entire 1920px vertical space by defaulting to `justifyContent: "space-evenly"` or `"space-between"`. 
 - **STEP TIMELINE INDICATORS**: For multi-step architectures or timelines, add a clean stage-indicator badge at the top (e.g., `STEP 1: DUAL TRUST 👥` or `STEP 4: CLEANUP 🧹`) to visually chunk the flow.
 - **VERTICAL CANVAS SPACE BUDGET**: The 1080x1920 portrait canvas is narrow and height-constrained. Keep flow diagrams to a maximum of 3 vertical components (e.g., Node ➔ Arrow ➔ Node). Compress component paddings/margins to prevent elements from colliding or rendering out-of-screen.
 - **TRANSITION FLASH PROTECTION**: Never leave the canvas completely blank or empty at the start of a scene transition. Ensure structural host nodes (like headers or system actors) enter immediately at `frame 0` of the sequence, reserving delayed entrance transitions (e.g. `frame - 10`) exclusively for transient data packets or success banners.
@@ -241,7 +241,7 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 
 ### Typography
 
-- **MASSIVE FONTS**: Set titles to at least `80px-90px+` and paragraph/label/code/diagram texts to at least `48px-68px+` (at least 4 times larger than desktop defaults). Make them bold, massive, and unmissable on mobile screens.
+- **MASSIVE FONTS (MANDATORY)**: Mobile viewers read fast. Set Main Titles to at least `90px-110px`, Section Subtitles to `42px-54px`, and paragraph/label/code text to at least `38px-64px`. Formulas or giant numbers can be up to `70px-100px`. If it looks "too big" for desktop, it's correct for mobile Shorts.
 - Use bold, high-contrast sans-serif titles.
 - **EMOJI INJECTIONS**: Intentionally place 1-2 expressive emojis in slide titles (e.g., `TRAP 🚨`, `RENEWAL ⏳`, `COMPLETED 🛡️`) and key diagram nodes to reduce visual dullness and enhance graphic energy.
 - Use restrained monospace type for technical labels, compact badges, counters, framework names, and footer notes.
@@ -376,12 +376,13 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 
 1. **Consolidate Script**: Define exactly one clip in `narration-manifest.json` containing the entire script (e.g., `full_script`).
 2. **Generate E2E Audio**: Run the generation script. This outputs `narration_full_raw.wav` with perfect prosody but fading volume.
-3. **Apply Loudness Normalization**: Use FFmpeg's `loudnorm` filter (EBU R128) to dynamically boost quiet parts.
-   > **WARNING (Clipped End):** The final sentence can get cut off halfway due to audio buffer flush limits. **You MUST leave at least 60 frames (2 seconds) of final visual padding/margin at the end of the composition.**
+3. **Apply Loudness Normalization & Silence Padding**: Use FFmpeg's `loudnorm` filter (EBU R128) to dynamically boost quiet parts.
+   > **WARNING (Clipped End & Abrupt Stop):** Neural TTS models often stop instantly after generating the final word, leading to an abrupt, unnatural end. Furthermore, audio buffer flushes can cut the last syllable off entirely. **You MUST force FFmpeg to append 1.5 - 2.0 seconds of absolute silence at the end using the `apad=pad_dur=1.5` filter.**
+   > **WARNING (Remotion Sequence Extension):** Because you physically extended the audio file via padding, you must also manually increase the `durationInFrames` in your `Composition.tsx` by the corresponding amount (e.g., `+45` frames for 1.5 seconds) AND extend the final scene's `<Sequence>` `durationInFrames` to soak up the extra time.
    > **WARNING (Instant Hook Start):** YouTube Shorts must hook the user instantly. Do NOT add silent intro padding/delay at the beginning of the video track. The audio narration must start immediately at `0.00s` to maximize viewer retention.
    > **WARNING (Sample Rate Resampling):** The `loudnorm` filter has a known bug where it can default the output to an extremely high `192kHz` sample rate, which causes Remotion (and most browsers) to completely mute the audio track during rendering. **You MUST explicitly add `-ar 44100` to force standard resampling.**
    ```bash
-   ffmpeg -y -i audio/narration_full_raw.wav -af "loudnorm=I=-14:LRA=11:TP=-1.5" -ar 44100 audio/narration_full.wav
+   ffmpeg -y -i audio/narration_full_raw.wav -af "loudnorm=I=-14:LRA=11:TP=-1.5,apad=pad_dur=1.5" -ar 44100 audio/narration_full.wav
    ```
 
 > **CRITICAL RULE FOR TTS SCRIPTING:** The spoken language generated by the TTS must closely match the text displayed on the visual slides. Avoid unnecessary verbosity or divergent phrasing. Keep the narration concise and tightly aligned with the on-screen keywords so the viewer can effortlessly connect the audio with the visuals.
