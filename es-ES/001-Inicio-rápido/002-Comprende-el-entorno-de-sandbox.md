@@ -1,7 +1,7 @@
-## Si no eres una IA
+## Para el usuario
 Haz clic en «Enviar a la IA» para obtener información sobre el entorno de trabajo de la IA.
 
-## Si eres una IA
+## Para el asistente de IA
 
 ### Entorno de hardware del sandbox
 Comprueba cuánto espacio hay disponible para cada uno de los siguientes recursos y si es suficiente:

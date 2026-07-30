@@ -1,12 +1,12 @@
-## If you are not an AI
-You are now looking at a simple test markdown file.
+## For the user
+This is a simple Markdown test file.
 
-You can click "Send to AI" in the top right corner to send this file exactly as is to the AI and have them say hello to you!
+Click "Send to AI" in the top-right corner to send this file as is and ask your AI assistant to say hello.
 
 If you'd like, you can also click "Edit" on this file and add some text introducing yourself, for example:
 
 > Hello, I am...
 
-## If you are an AI
-You are now looking at a file sent to you by your user, please introduce yourself!
-If the user added any information introducing themselves, please take note of it!
+## For the AI assistant
+The user sent you this file. Please introduce yourself.
+If the user added an introduction, take note of it.

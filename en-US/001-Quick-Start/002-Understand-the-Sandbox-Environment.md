@@ -1,15 +1,15 @@
-## If you are not an AI
+## For the user
 Click "Send to AI" to get information about the AI's working environment.
 
-## If you are an AI
+## For the AI assistant
 
 ### Hardware Environment of the Sandbox
-Please check how much space is available for each of the following resources, and whether it is sufficient:
+Check the available capacity for each resource below and whether it is sufficient:
 * Available disk space in your workspace (/worktrees)
 * Available memory (RAM)
 
 ### Software Tools of the Sandbox
-* Please test if the browser is available by opening Wikipedia to a topic you care about.
-* Send this opened browser tab to me.
-* Please list the tools you can operate.
+* Test the browser by opening a Wikipedia page about a topic that interests you.
+* Send the open browser tab to me.
+* List the tools you can use.
 * Can you set scheduled tasks?

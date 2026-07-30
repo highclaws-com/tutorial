@@ -1,7 +1,7 @@
-## Si vous n'êtes pas une IA
+## Pour l'utilisateur
 Cliquez sur « Envoyer à l'IA » pour obtenir des informations sur l'environnement de travail de l'IA.
 
-## Si vous êtes une IA
+## Pour l'assistant IA
 
 ### Environnement matériel de la sandbox
 Veuillez vérifier l'espace disponible pour chacune des ressources suivantes et si cet espace est suffisant :
@@ -12,4 +12,4 @@ Veuillez vérifier l'espace disponible pour chacune des ressources suivantes et 
 * Veuillez tester si le navigateur est disponible en ouvrant Wikipédia sur un sujet qui vous intéresse.
 * Envoyez-moi cet onglet de navigateur ouvert.
 * Veuillez lister les outils que vous pouvez utiliser.
-* Pouvez-vous programmer des tâches planifiées ?
+* Pouvez-vous planifier des tâches ?

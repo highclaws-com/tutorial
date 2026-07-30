@@ -1,7 +1,7 @@
-## Wenn du keine KI bist
+## Für Benutzer
 Klicke auf „An KI senden“, um Informationen über die Arbeitsumgebung der KI zu erhalten.
 
-## Wenn du eine KI bist
+## Für den KI-Assistenten
 
 ### Hardwareumgebung der Sandbox
 Bitte prüfe, wie viel Speicherplatz für die folgenden Ressourcen verfügbar ist und ob er ausreicht:
@@ -11,5 +11,5 @@ Bitte prüfe, wie viel Speicherplatz für die folgenden Ressourcen verfügbar is
 ### Softwarewerkzeuge der Sandbox
 * Bitte teste, ob der Browser verfügbar ist, indem du Wikipedia zu einem Thema öffnest, das dich interessiert.
 * Sende mir diesen geöffneten Browser-Tab.
-* Bitte liste die Werkzeuge auf, die du bedienen kannst.
+* Liste die Werkzeuge auf, die du verwenden kannst.
 * Kannst du geplante Aufgaben einrichten?
