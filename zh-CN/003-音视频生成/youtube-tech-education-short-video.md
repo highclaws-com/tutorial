@@ -211,6 +211,21 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - **NEVER use internal business terminology** (e.g., "Sandbox", "Gateway", "Step CA") in the script or visual assets.
 - ALWAYS abstract concepts to universally understood architectural terms (e.g., "Dynamic Node", "API Proxy", "Internal CA"). Educational content must be broadly applicable, not tied to a specific company's internal infrastructure naming.
 
+### Scientific & Mathematical Explanations (MANDATORY)
+
+- **Strict Epistemology**: Do not mischaracterize the nature of a concept. If a concept is an "empirical law" observed from data (like Scaling Laws), state it explicitly. Do not lazily frame it as an "engineering perspective" or a "theorem".
+- **Epistemic Modesty (Data vs. Absolutes)**: When discussing empirical data, real-world scatter plots, or benchmarks, avoid absolute language (e.g., "clusters exactly inside", "converges perfectly"). Real-world data is messy; use grounded framing like "clusters around the optimal band".
+- **Exhaustive Variable Labeling**: EVERY formula shown on screen MUST be accompanied by a clear, explicit legend defining EVERY variable right below it (e.g., `$L$ = Loss, $N$ = Parameters`). Do not assume the audience remembers from a previous scene.
+- **Audio/Visual Asymmetry (Formula Translation)**: When a complex formula like $C \approx 6ND$ is on screen, the voiceover should NEVER read the literal math variables ("C equals six N D"). The voiceover must act as a human translator (e.g., "Compute FLOPs equals six times parameters times tokens") so the audience can map the spoken concepts to the visual symbols.
+- **Auditory Cognitive Load (Number Rounding)**: Do not force the TTS to read out long decimals or hyper-specific academic numbers (e.g., "0.2849"). This destroys pacing. Abstract them in the voiceover into dramatic narrative concepts (e.g., "a tiny two-digit rounding error"), while leaving the exact precision for the visual screen.
+- **Visual Curve Pairings**: Formulas must always be paired with a visual curve (or multiple curves) demonstrating the relationship between the key variables.
+- **Preserve Iconic Formula Structures**: DO NOT mathematically simplify famous academic formulas if it destroys their recognizable shape (e.g., do not simplify Kaplan's iconic `(C / N)^\alpha` into `A / N^\alpha`). The audience expects the famous structure.
+- **Eradicate Ambiguous Subscripts**: While preserving the formula's structure, you MUST rename confusing subscript variables (like `N_c` or `\alpha_N`) to unambiguous single-letter constants (like `C` or `\alpha`). In a fast-paced video format, adjacent letters are easily mistaken for multiplication (e.g., `alpha * N`).
+- **SVG Coordinate Reality Checks**: When hand-coding SVG curves for "Performance vs Scale":
+  - Remember that SVG Y-coordinates go DOWN. To show performance increasing, your path must go UP towards `Y=0`.
+  - Empirical scaling laws usually exhibit **diminishing returns (logarithmic/convex growth)**. The curve must shoot up quickly and then flatten out. Do NOT draw exponential/accelerating curves for performance scaling; this is a fundamental logical error.
+- **Horizontal Safe Margins (Visual Overflow)**: In a 9:16 vertical canvas (1080px wide), complex LaTeX formulas and long side-by-side flex layouts will easily overflow. Always stack complex side-by-side elements vertically (`flexDirection: 'column'`) and reduce font sizes aggressively for long equations to prevent edge clipping.
+
 ### Palette
 
 | Role | Color |
