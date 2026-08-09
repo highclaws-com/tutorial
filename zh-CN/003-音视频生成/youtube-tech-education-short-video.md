@@ -408,6 +408,12 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 
 > **TTS PRONUNCIATION & SWALLOW FIXES:** If your script contains camelCase variables (e.g., `sameSite`) or hyphenated acronyms (e.g., `proxy-ssl-ca`), the neural TTS model may choke, swallow syllables/words in the middle of narration, or terminate early. You MUST rewrite these phonetically with spaces (e.g., `same site` or `proxy S S L C A`) in the JSON manifest text to ensure flawless pronunciation.
 
+> **THE 180-SECOND HARD LIMIT (SHORTS FORMAT):** YouTube Shorts are STRICTLY bounded. A video over 180.00 seconds will be automatically reclassified by YouTube as a standard VOD (Video on Demand), killing its Shorts algorithm reach. 
+> To ensure you never hit this ceiling, **aggressively strip all fluff words** from the script:
+> - Remove long hooks (e.g., instead of "What exactly is the Scaling Law... Let's look at how it evolved", just say "What is the AI Scaling Law?").
+> - Remove summary "takeaways" or conclusions at the end. The final explosive point (like fixing a bug or showing a formula) IS the ending.
+> - Delete conversational padding like "observed from massive amounts of data" or "exactly". Every single second counts.
+
 ### Audio-Visual Sync via Whisper (MANDATORY)
 
 - **INTEGRATED PIPELINE EXECUTION**: Always build an all-in-one automation script (e.g. `generate_tts.py`) that encapsulates voice generation, loudness normalization, and Whisper timestamp transcription in a single step. This keeps the asset workspace robust and makes timestamps instantly reviewable in a single console log.
