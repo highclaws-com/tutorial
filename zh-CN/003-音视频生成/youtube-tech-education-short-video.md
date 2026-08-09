@@ -213,7 +213,9 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 
 ### Scientific & Mathematical Explanations (MANDATORY)
 
+- **Beyond the Conclusion (The "Why" and "How")**: Never just state a scientific conclusion or a final formula (e.g., "$D=20N$"). You MUST explain the deeper physical, mathematical, or historical origin of the numbers. Distinguish between hardware physics (e.g., "$C=6ND$ due to forward/backward passes") and empirical learning laws. Reveal engineering trade-offs, historical optimizer bugs (e.g., Epoch AI fixing DeepMind's L-BFGS), and mathematical "aha!" moments. The audience wants profound, hard-won insights, not just a textbook summary.
 - **Strict Epistemology**: Do not mischaracterize the nature of a concept. If a concept is an "empirical law" observed from data (like Scaling Laws), state it explicitly. Do not lazily frame it as an "engineering perspective" or a "theorem".
+- **Academic Citations (MANDATORY)**: For all science and research-based videos, EVERY time a specific paper is mentioned (e.g., Kaplan, Chinchilla), you MUST render a formal, academic-style citation at the bottom of the screen (e.g., `Reference: "Title of Paper" (Author et al., Year)`). Treat the screen like a proper research presentation.
 - **Epistemic Modesty (Data vs. Absolutes)**: When discussing empirical data, real-world scatter plots, or benchmarks, avoid absolute language (e.g., "clusters exactly inside", "converges perfectly"). Real-world data is messy; use grounded framing like "clusters around the optimal band".
 - **Exhaustive Variable Labeling**: EVERY formula shown on screen MUST be accompanied by a clear, explicit legend defining EVERY variable right below it (e.g., `$L$ = Loss, $N$ = Parameters`). Do not assume the audience remembers from a previous scene.
 - **Audio/Visual Asymmetry (Formula Translation)**: When a complex formula like $C \approx 6ND$ is on screen, the voiceover should NEVER read the literal math variables ("C equals six N D"). The voiceover must act as a human translator (e.g., "Compute FLOPs equals six times parameters times tokens") so the audience can map the spoken concepts to the visual symbols.
@@ -224,6 +226,7 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - **SVG Coordinate Reality Checks**: When hand-coding SVG curves for "Performance vs Scale":
   - Remember that SVG Y-coordinates go DOWN. To show performance increasing, your path must go UP towards `Y=0`.
   - Empirical scaling laws usually exhibit **diminishing returns (logarithmic/convex growth)**. The curve must shoot up quickly and then flatten out. Do NOT draw exponential/accelerating curves for performance scaling; this is a fundamental logical error.
+- **NEVER Risk In-Plot SVG Legends (MANDATORY)**: Never try to manually hardcode `<text>` tags inside an `<svg>` to label curves (e.g., `D ≈ 20N`). It is extremely fragile and AI agents constantly miscalculate the `(x, y)` coordinates, causing text to overlap the curve. ALWAYS place legends safely in standard HTML `<div>` blocks *outside* the SVG area (e.g., directly below the chart).
 - **Horizontal Safe Margins (Visual Overflow)**: In a 9:16 vertical canvas (1080px wide), complex LaTeX formulas and long side-by-side flex layouts will easily overflow. Always stack complex side-by-side elements vertically (`flexDirection: 'column'`) and reduce font sizes aggressively for long equations to prevent edge clipping.
 
 ### Palette
@@ -396,8 +399,9 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
    > **WARNING (Remotion Sequence Extension):** Because you physically extended the audio file via padding, you must also manually increase the `durationInFrames` in your `Composition.tsx` by the corresponding amount (e.g., `+45` frames for 1.5 seconds) AND extend the final scene's `<Sequence>` `durationInFrames` to soak up the extra time.
    > **WARNING (Instant Hook Start):** YouTube Shorts must hook the user instantly. Do NOT add silent intro padding/delay at the beginning of the video track. The audio narration must start immediately at `0.00s` to maximize viewer retention.
    > **WARNING (Sample Rate Resampling):** The `loudnorm` filter has a known bug where it can default the output to an extremely high `192kHz` sample rate, which causes Remotion (and most browsers) to completely mute the audio track during rendering. **You MUST explicitly add `-ar 44100` to force standard resampling.**
+   > **WARNING (Audio Cache Trap):** If your TTS script saves audio to `workspace/audio/narration_full.wav`, but Remotion (`staticFile`) reads from `workspace/public/narration_full.wav`, you will continuously render video with an outdated, broken audio file! You MUST `cp audio/narration_full.wav public/narration_full.wav` before rendering.
    ```bash
-   ffmpeg -y -i audio/narration_full_raw.wav -af "loudnorm=I=-14:LRA=11:TP=-1.5,apad=pad_dur=1.5" -ar 44100 audio/narration_full.wav
+   ffmpeg -y -i audio/narration_full_raw.wav -af "loudnorm=I=-14:LRA=11:TP=-1.5,apad=pad_dur=1.5" -ar 44100 public/narration_full.wav
    ```
 
 > **CRITICAL RULE FOR TTS SCRIPTING:** The spoken language generated by the TTS must closely match the text displayed on the visual slides. Avoid unnecessary verbosity or divergent phrasing. Keep the narration concise and tightly aligned with the on-screen keywords so the viewer can effortlessly connect the audio with the visuals.
@@ -417,9 +421,10 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 
 ### Validate and Render
 
-1. Verify `narration_full.wav` exists in `<WORKSPACE>/audio/`.
+1. Verify `narration_full.wav` exists in `<WORKSPACE>/public/`.
 2. Probe the file: valid decode, correct length, and non-silent samples.
 3. Render the narrated video and verify the expected streams, dimensions, FPS, duration, and audio/video synchronization.
+4. **MANDATORY FINAL WHISPER VERIFICATION**: Before showing the user the final output, write a tiny `verify.py` script that uses `whisper.load_model("base").transcribe("out/video.mp4")` to extract the text *directly from the final rendered MP4*. This is the ONLY way to guarantee the final video isn't using a cached, broken audio track. Share this whisper transcript with the user.
 
 ---
 
