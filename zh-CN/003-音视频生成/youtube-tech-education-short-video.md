@@ -44,9 +44,10 @@ If `<SHORTS_ROOT>` is not supplied or cannot be discovered, ask the user before 
 
 4. **Be concise and compelling.**
    - Keep the Short below two minutes unless the user requests otherwise.
-   - Open with the value, tension, surprising claim, or central question.
+   - **Start with the subject itself.** The first frame and first spoken sentence should present the core fact, mechanism, data, command, or question directly.
+   - Do not add a separate curiosity hook, teaser, setup, or promise when the technical content can begin immediately.
    - Eliminate slow introductions, repeated conclusions, and filler.
-   - Be deliberately title-forward: use curiosity, contrast, urgency, and a strong opinion to earn attention.
+   - Prefer precise, descriptive titles over curiosity, urgency, or opinion-driven packaging.
    - Optimize for clicks while keeping the central factual promise defensible; do not fabricate evidence, results, or capabilities.
 
 5. **Draft, never publish.**
@@ -58,7 +59,7 @@ If `<SHORTS_ROOT>` is not supplied or cannot be discovered, ask the user before 
    - A four-second beat can carry one short idea—not a heading, paragraph, labels, and animation.
    - **NO METAPHORS (MANDATORY):** Never use analogies, metaphors, or childish comparisons (e.g., restaurants, leaky buckets, waiting rooms, highways). Explain the actual technical mechanism directly, literally, and professionally. Your audience consists of engineers.
    - **LITERAL STATE REPRESENTATION**: Instead of analogies, explain processes using literal representations of system assets—such as sequence flowcharts, database row states, configuration payloads, or strict API protocols.
-   - Treat the practical reason or use case as primary content, not as a footnote. Give it title-level hierarchy when it is the main takeaway.
+   - Treat the practical reason or use case as primary content, not as a footnote. Give it title-level hierarchy when it is the main point.
    - If motion already explains the mechanism, do not repeat it with explanatory text. Keep only the minimum words needed to establish purpose or consequence.
    - Keep readable text static. Never move URLs, code, headers, or sentences that viewers must decode.
 
@@ -76,13 +77,13 @@ If `<SHORTS_ROOT>` is not supplied or cannot be discovered, ask the user before 
 
 ### 2.1 Infer the brief from context
 
-A Short often begins after a useful discussion of a concept, rather than from a fully specified production brief. Use the current conversation as the source of truth for the topic, the important claims, the intended takeaway, and the appropriate depth.
+A Short often begins after a useful discussion of a concept, rather than from a fully specified production brief. Use the current conversation as the source of truth for the topic, the important claims, the intended result, and the appropriate depth.
 
 When the user asks to turn a discussed knowledge point into a Short, begin drafting immediately. Do **not** ask routine follow-up questions about audience, language, duration, visual style, evidence, or renderer. Make pragmatic defaults:
 
 - English output;
 - under two minutes;
-- a direct, title-forward educational hook;
+- an immediate start with the core technical content;
 - the warm editorial field-note design system in this document;
 - the renderer best suited to the concept.
 
@@ -104,13 +105,11 @@ Use this format:
 # <Short Title> — Script
 
 > **Status:** Working English script; revise until approved.
-> **Target duration:** <for example, 45–75 seconds; under two minutes>
 > **Tone:** Direct, concise, lightly playful
-> **Timing note:** Section lengths are approximate planning estimates. Actual sequence timing is finalized after visual iteration and measured narration audio.
 
 ---
 
-## 1. Hook — ~6 seconds
+## 1. <Section title>
 
 **On screen**
 - Title: `...`
@@ -121,7 +120,7 @@ Use this format:
 
 ---
 
-## 2. <Key idea> — ~12 seconds
+## 2. <Section title>
 
 **On screen**
 - ...
@@ -131,7 +130,7 @@ Use this format:
 
 ---
 
-## 3. Takeaway — ~8 seconds
+## 3. <Section title>
 
 **On screen**
 - ...
@@ -143,10 +142,11 @@ Use this format:
 The script must include:
 
 - numbered sections;
-- approximate per-section durations, not exact start/end timestamps;
 - concise on-screen direction;
 - exact voice-over wording;
-- a direct hook and useful takeaway;
+- an immediate opening that begins the explanation itself;
+- enough explanation to make the mechanism, data, or comparison genuinely understandable;
+- an abrupt clean ending immediately after the last necessary fact, operation, or visual resolves—no conclusion, recap, sign-off, or dedicated ending section;
 - enough visual detail for a renderer to implement the Short without guessing.
 
 ### 2.3 Hand off for script review
@@ -168,7 +168,7 @@ For each review round:
 
 1. Read the newest script and identify all replacements, deletions, annotations, and structural changes.
 2. Interpret instructions in any language.
-3. Rewrite the result as natural English while retaining the required approximate section-duration, **On screen**, and **Voice-over** structure.
+3. Rewrite the result as natural English while retaining the required **On screen** and **Voice-over** structure.
 4. Patch `<PROJECT_ROOT>/script.md` in place. Do not create numbered script copies.
 5. Briefly state what changed and share the script path and file-browser link when available.
 
@@ -279,16 +279,16 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 
 ### Information hierarchy and motion
 
-- Use a small chapter badge, large headline, primary visual, explanatory card, and quiet footer/field-note summary where appropriate.
+- Use a small chapter badge, large headline, primary visual, and explanatory card where appropriate.
 - Use `01`, `02`, `03`-style bullets when a list is needed.
-- **PUNCHY ONE-SENTENCE SUMMARY**: Inside the `FIELD NOTE` summary box at the end, use a single, highly memorable, punchy takeaway sentence to maximize audience recall and summarize the core engineering design heuristic (e.g. `FIELD NOTE ➔ "Never deploy without a fallback route"`).
-- Use brief field-note summaries such as `FIELD NOTE → ...` rather than dense closing paragraphs.
+- Do not add a mandatory `FIELD NOTE`, recap card, closing takeaway, or dedicated ending scene. Stop immediately when the explanation is complete.
+- Use a brief field-note summary only when the user asks for one or when it adds information that has not already been communicated.
 - Animate with subtle fade/vertical spring entrances, light staggering, clean transitions, and intentional pauses.
 - Motion should reveal hierarchy and sequence; it should never compete with the explanation.
 
 ### Attention budget
 
-- Give every scene one dominant takeaway.
+- Give every scene one dominant technical idea.
 - Match copy length to screen time. For a roughly four-second beat, prefer one immediately readable phrase or a very short sentence.
 - When the use case is the lesson, size it like a headline; do not demote it to small footer text.
 - Remove secondary labels, mechanism descriptions, status codes, and protocol detail unless they are necessary to understand the lesson.
@@ -378,8 +378,8 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
   "instruction": "Speak clearly, warmly, and with an upbeat technical-demo tone.",
   "clips": [
     {
-      "id": "hook",
-      "file": "hook.wav",
+      "id": "first_point",
+      "file": "first_point.wav",
       "text": "Exact approved narration goes here."
     }
   ]
@@ -397,7 +397,7 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 3. **Apply Loudness Normalization & Silence Padding**: Use FFmpeg's `loudnorm` filter (EBU R128) to dynamically boost quiet parts.
    > **WARNING (Clipped End & Abrupt Stop):** Neural TTS models often stop instantly after generating the final word, leading to an abrupt, unnatural end. Furthermore, audio buffer flushes can cut the last syllable off entirely. **You MUST force FFmpeg to append 1.5 - 2.0 seconds of absolute silence at the end using the `apad=pad_dur=1.5` filter.**
    > **WARNING (Remotion Sequence Extension):** Because you physically extended the audio file via padding, you must also manually increase the `durationInFrames` in your `Composition.tsx` by the corresponding amount (e.g., `+45` frames for 1.5 seconds) AND extend the final scene's `<Sequence>` `durationInFrames` to soak up the extra time.
-   > **WARNING (Instant Hook Start):** YouTube Shorts must hook the user instantly. Do NOT add silent intro padding/delay at the beginning of the video track. The audio narration must start immediately at `0.00s` to maximize viewer retention.
+   > **WARNING (Immediate Content Start):** Do NOT add silent intro padding or delay at the beginning of the video track. The technical content and narration must start immediately at `0.00s`.
    > **WARNING (Sample Rate Resampling):** The `loudnorm` filter has a known bug where it can default the output to an extremely high `192kHz` sample rate, which causes Remotion (and most browsers) to completely mute the audio track during rendering. **You MUST explicitly add `-ar 44100` to force standard resampling.**
    > **WARNING (Audio Cache Trap):** If your TTS script saves audio to `workspace/audio/narration_full.wav`, but Remotion (`staticFile`) reads from `workspace/public/narration_full.wav`, you will continuously render video with an outdated, broken audio file! You MUST `cp audio/narration_full.wav public/narration_full.wav` before rendering.
    ```bash
@@ -410,8 +410,8 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 
 > **THE 180-SECOND HARD LIMIT (SHORTS FORMAT):** YouTube Shorts are STRICTLY bounded. A video over 180.00 seconds will be automatically reclassified by YouTube as a standard VOD (Video on Demand), killing its Shorts algorithm reach. 
 > To ensure you never hit this ceiling, **aggressively strip all fluff words** from the script:
-> - Remove long hooks (e.g., instead of "What exactly is the Scaling Law... Let's look at how it evolved", just say "What is the AI Scaling Law?").
-> - Remove summary "takeaways" or conclusions at the end. The final explosive point (like fixing a bug or showing a formula) IS the ending.
+> - Remove hooks and setup language. Begin with the first technical fact, operation, or question.
+> - Remove summary "takeaways," conclusions, sign-offs, and ending transitions. Stop immediately after the last necessary explanation.
 > - Delete conversational padding like "observed from massive amounts of data" or "exactly". Every single second counts.
 
 ### Audio-Visual Sync via Whisper (MANDATORY)
