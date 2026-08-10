@@ -146,7 +146,7 @@ The script must include:
 - exact voice-over wording;
 - an immediate opening that begins the explanation itself;
 - enough explanation to make the mechanism, data, or comparison genuinely understandable;
-- an abrupt clean ending immediately after the last necessary fact, operation, or visual resolves—no conclusion, recap, sign-off, or dedicated ending section;
+- a clean ending after the last necessary fact, operation, or visual resolves—no conclusion, recap, sign-off, or dedicated ending section. Leave a short visual tail so the final motion can resolve and the viewer can read the completed state; do not cut off the last word or snap immediately to black;
 - enough visual detail for a renderer to implement the Short without guessing.
 
 ### 2.3 Hand off for script review
@@ -389,8 +389,10 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 ### Generating Continuous TTS (Fixing Attention Decay, Clipped End, and Swallowed Words)
 
 > **CRITICAL TTS RULE:** Generating a single extremely long text string in neural TTS models (like Qwen3-TTS) often leads to **Attention Decay** where the volume fades out toward the end. However, manually splitting the audio breaks natural prosody and breath pacing.
-> 
+>
 > **SOLUTION:** Always use **End-to-End (E2E) single-clip generation** to preserve the emotional flow, and then use **FFmpeg Dynamic Range Compression (Loudness Normalization)** to mathematically fix the volume drop.
+
+> **HARD SPEECH-RATE LIMIT:** Final narration must use its natural generated pace whenever possible. FFmpeg `atempo` must never exceed `1.3`. Values above `1.3` are prohibited even when they would make the video fit a target duration. If narration is too long, shorten redundant spoken wording while preserving required facts on screen, reduce pauses that are genuinely excessive, or split the subject into multiple videos. Never solve an overlong script by making dense technical narration difficult to follow.
 
 1. **Consolidate Script**: Define exactly one clip in `narration-manifest.json` containing the entire script (e.g., `full_script`).
 2. **Generate E2E Audio**: Run the generation script. This outputs `narration_full_raw.wav` with perfect prosody but fading volume.
