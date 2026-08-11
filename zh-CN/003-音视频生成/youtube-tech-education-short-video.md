@@ -294,6 +294,22 @@ Create a warm, polished, editorial technical video—not a default blue/purple A
 - Remove secondary labels, mechanism descriptions, status codes, and protocol detail unless they are necessary to understand the lesson.
 - Review the scene at playback speed, not only as a still frame. If the eye must choose between reading and following motion, simplify the scene.
 
+### Quantitative comparison charts
+
+- Use one consistent visual grammar for the whole comparison. Do not make viewers relearn a new chart type on every scene.
+- Do not render a spreadsheet or table as the primary visual. Convert rows into a proportional axis with exact labels.
+- Plot values at their true proportional positions. Never give adjacent hierarchy levels equal spacing when their numeric gaps differ.
+- In a portrait video, prefer a vertical quantitative axis so the scale uses the long dimension. Labels may flank it on both sides without turning the composition into a horizontal slide.
+- When the range is too large, zoom the same axis in stages while preserving its meaning. Do not replace proportional scale with decorative tier widths.
+- Print complete units on every tick and value label: write `GB/s`, `TB/s`, and `PFLOP/s`, never unexplained abbreviations such as `T` or `P`.
+- Treat mathematical notation as semantic. Use `5 ns = 10× L1`, not a decorative bullet or centered dot between values that form an equality.
+- Center the axis mathematically within the drawable content area, then make left/right connector geometry symmetric around it.
+- Keep labels outside the axis and reserve explicit non-overlapping positions for every final state. Verify the fully populated frame, not only early sparse frames.
+- Synchronize each reveal to the sentence that discusses it, and hold the populated state long enough to read; do not make labels flash past merely to fit narration.
+- Remove text that merely describes the encoding—such as `LINEAR`, `ACTIVE`, or an upper-bound explanation—when the axis, units, or color already communicates it.
+- Use a thick, solid red border to indicate the item currently under discussion. Do not combine it with an `ACTIVE: ...` label, glow, or decorative motion.
+- Let the screen carry exact secondary numbers while narration carries the comparison. Not every visible number must be spoken, but every measured value that is spoken must include its unit.
+
 ---
 
 ## 6. Phase E — Build a topic-local video project
@@ -386,17 +402,18 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 }
 ```
 
-### Generating Continuous TTS (Fixing Attention Decay, Clipped End, and Swallowed Words)
+### Generating and validating continuous TTS
 
-> **CRITICAL TTS RULE:** Generating a single extremely long text string in neural TTS models (like Qwen3-TTS) often leads to **Attention Decay** where the volume fades out toward the end. However, manually splitting the audio breaks natural prosody and breath pacing.
->
-> **SOLUTION:** Always use **End-to-End (E2E) single-clip generation** to preserve the emotional flow, and then use **FFmpeg Dynamic Range Compression (Loudness Normalization)** to mathematically fix the volume drop.
+> **CRITICAL TTS RULE:** Attempt End-to-End (E2E) single-clip generation first because it best preserves prosody and breath pacing. However, long Qwen3-TTS generations can fade, omit sentences, repeat phrases, hallucinate words, or corrupt dense numeric sequences. Loudness normalization fixes level—not missing or incorrect speech.
 
 > **HARD SPEECH-RATE LIMIT:** Final narration must use its natural generated pace whenever possible. FFmpeg `atempo` must never exceed `1.3`. Values above `1.3` are prohibited even when they would make the video fit a target duration. If narration is too long, shorten redundant spoken wording while preserving required facts on screen, reduce pauses that are genuinely excessive, or split the subject into multiple videos. Never solve an overlong script by making dense technical narration difficult to follow.
 
-1. **Consolidate Script**: Define exactly one clip in `narration-manifest.json` containing the entire script (e.g., `full_script`).
-2. **Generate E2E Audio**: Run the generation script. This outputs `narration_full_raw.wav` with perfect prosody but fading volume.
-3. **Apply Loudness Normalization & Silence Padding**: Use FFmpeg's `loudnorm` filter (EBU R128) to dynamically boost quiet parts.
+1. **Attempt one complete clip:** Define the approved narration as one clip and generate it once.
+2. **Transcribe the raw generation:** Reject it if any required clause, number, unit, acronym, or final sentence is missing, duplicated, paraphrased into a different claim, or phonetically corrupted.
+3. **Use a minimal semantic split only after E2E fails:** Split into the smallest practical number of balanced clips—usually two—at complete topic or sentence boundaries. Keep the same speaker, instruction, loudness target, and generation style. Never repair a long narration with many tiny patches.
+4. **Verify every clip independently:** Transcribe each raw clip before joining. A valid combined transcript cannot prove that a bad clip boundary sounds natural.
+5. **Join once, then process globally:** Insert one short, consistent boundary pause. Apply any `atempo`, loudness normalization, resampling, and final padding to the complete joined track—not selectively to one section.
+6. **Apply Loudness Normalization & Silence Padding:** Use FFmpeg's `loudnorm` filter (EBU R128) after generation succeeds.
    > **WARNING (Clipped End & Abrupt Stop):** Neural TTS models often stop instantly after generating the final word, leading to an abrupt, unnatural end. Furthermore, audio buffer flushes can cut the last syllable off entirely. **You MUST force FFmpeg to append 1.5 - 2.0 seconds of absolute silence at the end using the `apad=pad_dur=1.5` filter.**
    > **WARNING (Remotion Sequence Extension):** Because you physically extended the audio file via padding, you must also manually increase the `durationInFrames` in your `Composition.tsx` by the corresponding amount (e.g., `+45` frames for 1.5 seconds) AND extend the final scene's `<Sequence>` `durationInFrames` to soak up the extra time.
    > **WARNING (Immediate Content Start):** Do NOT add silent intro padding or delay at the beginning of the video track. The technical content and narration must start immediately at `0.00s`.
@@ -409,6 +426,14 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 > **CRITICAL RULE FOR TTS SCRIPTING:** The spoken language generated by the TTS must closely match the text displayed on the visual slides. Avoid unnecessary verbosity or divergent phrasing. Keep the narration concise and tightly aligned with the on-screen keywords so the viewer can effortlessly connect the audio with the visuals.
 
 > **TTS PRONUNCIATION & SWALLOW FIXES:** If your script contains camelCase variables (e.g., `sameSite`) or hyphenated acronyms (e.g., `proxy-ssl-ca`), the neural TTS model may choke, swallow syllables/words in the middle of narration, or terminate early. You MUST rewrite these phonetically with spaces (e.g., `same site` or `proxy S S L C A`) in the JSON manifest text to ensure flawless pronunciation.
+
+Do not blindly spell every acronym letter by letter. Test the intended pronunciation and use the smallest reliable rewrite: for example, `D-RAM`, `A one hundred`, or ordinary `CUDA`. Keep the human-readable spelling on screen even when the narration manifest uses a phonetic form.
+
+For dense numeric narration:
+
+- Include a unit every time a measured value is spoken; never say “L2 takes seven” or “bandwidth reaches five hundred four.”
+- Separate long numeric runs into natural sentences. If the TTS still corrupts them, narrate the endpoints or central comparison and retain intermediate exact values on screen.
+- If a duration limit requires acceleration, calculate the smallest factor that fits and apply it uniformly to the entire joined narration. Never accelerate only one clip or section, and never exceed `1.3×`.
 
 > **THE 180-SECOND HARD LIMIT (SHORTS FORMAT):** YouTube Shorts are STRICTLY bounded. A video over 180.00 seconds will be automatically reclassified by YouTube as a standard VOD (Video on Demand), killing its Shorts algorithm reach. 
 > To ensure you never hit this ceiling, **aggressively strip all fluff words** from the script:
@@ -433,6 +458,7 @@ Create `<WORKSPACE>/narration-manifest.json` as the single source of truth:
 2. Probe the file: valid decode, correct length, and non-silent samples.
 3. Render the narrated video and verify the expected streams, dimensions, FPS, duration, and audio/video synchronization.
 4. **MANDATORY FINAL WHISPER VERIFICATION**: Before showing the user the final output, write a tiny `verify.py` script that uses `whisper.load_model("base").transcribe("out/video.mp4")` to extract the text *directly from the final rendered MP4*. This is the ONLY way to guarantee the final video isn't using a cached, broken audio track. Share this whisper transcript with the user.
+5. Compare the final MP4 transcript with the exact last required technical fact. If that fact or its unit is absent, corrupted, or cut by the composition duration, do not deliver the file.
 
 ---
 
